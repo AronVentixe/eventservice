@@ -40,7 +40,7 @@ public class EventRepository(DataContext context) : BaseRepository<EventEntity>(
         try
         {
 
-            var entity = await _table.Include(x => x.Packages).FirstOrDefaultAsync(expression) ?? throw new Exception("not found.");
+            var entity = await _table.Include(x => x.Packages).ThenInclude(ep => ep.Package).FirstOrDefaultAsync(expression) ?? throw new Exception("not found.");
             return new RepositoryResult<EventEntity?> { Success = true, Result = entity };
         }
         catch (Exception ex)

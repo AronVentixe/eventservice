@@ -89,7 +89,20 @@ public class EventService(IEventRepository eventRepository) : IEventService
                 Title = result.Result.Title,
                 Description = result.Result.Description,
                 Location = result.Result.Location,
-                EventDate = result.Result.EventDate
+                EventDate = result.Result.EventDate,
+                Packages = result.Result.Packages
+                .Where(p => p.Package != null)
+                .Select(p => new Package
+                {
+                    Id = p.Package.Id,
+                    Title = p.Package.Title,
+                    SeatingArrangement = p.Package.SeatingArrangement,
+                    Placement = p.Package.Placement,
+                    Price = p.Package.Price,
+                    Currency = p.Package.Currency
+                }).ToList(),
+
+                StartingPrice = result.Result.Packages.Min(p => p.Package.Price) ?? 0
             }; 
 
             return new EventResult<Event?>
