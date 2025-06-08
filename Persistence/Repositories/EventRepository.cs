@@ -13,7 +13,7 @@ public class EventRepository(DataContext context) : BaseRepository<EventEntity>(
         try
         {
 
-            var entities = await _table.Include(x => x.Packages).ToListAsync();
+            var entities = await _table.Include(x => x.Packages).ThenInclude(ep => ep.Package).ToListAsync();
             return new RepositoryResult<IEnumerable<EventEntity>>
             {
                 Success = true,
@@ -28,6 +28,11 @@ public class EventRepository(DataContext context) : BaseRepository<EventEntity>(
                 Error = ex.Message
             };
         }
+    }
+
+    public async Task<decimal?> GetLowestPackagePriceAsync()
+    {
+        return await _context.Packages.MinAsync(p => p.Price);
     }
 
     public override async Task<RepositoryResult<EventEntity?>> GetAsync(Expression<Func<EventEntity, bool>> expression)

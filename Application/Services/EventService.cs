@@ -1,5 +1,6 @@
 ﻿using Application.Models;
 using Azure.Core;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using Persistence.Entities;
 using Persistence.Repositories;
@@ -43,6 +44,7 @@ public class EventService(IEventRepository eventRepository) : IEventService
 
     public async Task<EventResult<IEnumerable<Event>>> GetEventsAsync()
     {
+        var cheapestPackage = await _eventRepository.GetLowestPackagePriceAsync();
         var result = await _eventRepository.GetAllAsync();
         var events = result.Result?.Select(x => new Event
         {
@@ -51,7 +53,21 @@ public class EventService(IEventRepository eventRepository) : IEventService
             Title = x.Title,
             Description = x.Description,
             Location = x.Location,
-            EventDate = x.EventDate
+            EventDate = x.EventDate,
+
+            Packages = x.Packages
+            .Where(p => p.Package != null)
+            .Select(p => new Package
+            {
+                Id = p.Package.Id,
+                Title = p.Package.Title,
+                SeatingArrangement = p.Package.SeatingArrangement,
+                Placement = p.Package.Placement,
+                Price = p.Package.Price,
+                Currency = p.Package.Currency
+            }).ToList(),
+
+            StartingPrice = x.Packages.Min(p => p.Package.Price) ?? 0
         });
 
         return new EventResult<IEnumerable<Event>>

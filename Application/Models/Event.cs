@@ -11,4 +11,8 @@ public class Event
     public DateTime EventDate { get; set; }
     public string? Location { get; set; }
     public string? Description { get; set; }
+
+    public List<Package> Packages { get; set; } = [];
+    public decimal? StartingPrice { get; set; }
+
 }

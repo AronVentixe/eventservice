@@ -3,4 +3,5 @@ namespace Persistence.Repositories;
 
 public interface IEventRepository : IBaseRepository<EventEntity>
 {
+    Task<decimal?> GetLowestPackagePriceAsync();
 }
